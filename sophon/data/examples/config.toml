@@ -1,0 +1,73 @@
+# Sophon configuration. Every key is optional: anything left out uses the default shown here.
+# Location: ~/.config/sophon/config.toml (or $SOPHON_CONFIG). `swarm paths` shows every folder Sophon uses.
+
+[user]
+name = "the user"                       # how agents refer to you in prompts
+style = "British English, no emojis, no em dashes"
+
+[ollama]
+# Where the local worker models live.
+url = "http://127.0.0.1:11434"          # Ollama on this machine
+# Ollama on another machine (a home server, a desktop with a GPU): set ssh_host to an ~/.ssh/config alias and
+# Sophon opens an SSH tunnel itself (`swarm tunnel`). Ollama keeps listening on localhost there; nothing is exposed.
+ssh_host = ""
+remote = "127.0.0.1:11434"              # Ollama's address as seen from ssh_host
+tunnel_port = 11435                     # local end of that tunnel
+# Optional second Ollama (for example a CPU-only instance) for some models:
+cpu_url = ""
+cpu_models = []
+host_label = "MODELS"                   # name of the model host in the panel
+
+[models]
+triage = "gemma3:4b"                    # intake triage and questioners (fast, JSON)
+worker = "gemma3:4b"                    # default local worker
+strong = "gemma3:27b"                   # local lead, critics, final writer
+available = ["gemma3:4b", "gemma3:12b", "gemma3:27b", "qwen3:8b", "qwen3:14b"]
+roster = []                             # idea writers in long runs; empty = [strong, worker]
+critics = []                            # critic models; empty = [strong]
+embed = "nomic-embed-text"              # embeddings for de-duplication
+sizes_gb = { "gemma3:27b" = 17, "qwen3:14b" = 9.5 }   # RAM when loaded; Sophon frees memory before loading these
+
+[big]
+# Phantom mode: MoE models larger than your RAM, served by llama.cpp with the weights memory-mapped and the
+# server capped by systemd (MemoryMax). Whatever does not fit is re-read from the SSD on demand, so a 120B MoE
+# runs on a 16 GB machine at a few tokens per second. Read docs/big-models-low-ram.md first, then run
+# scripts/setup-big-model.sh.
+enabled = false
+host = ""                               # "" = this machine; else an SSH alias with llama.cpp and the models
+llama_server = "~/llama.cpp/build/bin/llama-server"
+models_dir = "~/models"
+ram_cap = "12G"                         # 8G for 16 GB machines, 16G-20G for 32 GB; see the table in the doc
+threads = 0                             # 0 = llama.cpp default (physical cores)
+ctx = 16384
+port = 11600
+extra_args = ["--no-repack", "--jinja"] # add "--cpu-moe" or "--n-cpu-moe", "N" plus "-ngl", "99" with a GPU
+
+[big.models.big-gptoss]
+file = "gpt-oss-120b-MXFP4.gguf"
+label = "gpt-oss 120B"
+effort = "medium"                       # reasoning effort: low, medium, high
+role = "both"                           # writer, judge or both
+repo = "ggml-org/gpt-oss-120b-GGUF"     # Hugging Face repo, used by scripts/setup-big-model.sh
+
+# A faster MoE for writing (about 1.5-2x the speed of gpt-oss 120B at the same cap):
+# [big.models.big-qwen3next]
+# file = "Qwen3-Next-80B-A3B-Instruct-IQ4_XS.gguf"
+# label = "Qwen3-Next 80B"
+# effort = ""
+# role = "writer"
+# repo = "unsloth/Qwen3-Next-80B-A3B-Instruct-GGUF"
+# (and set role = "judge" on big-gptoss above)
+
+[claude]
+budget = 2000000                        # fresh tokens per run before the lead is told to wrap up
+editor = true                           # one Sonnet editor pass over the local FINAL.md
+
+[memory]
+# Optional long-term memory through an MCP server you have added to Claude Code. Only the lead may write.
+mcp_prefix = ""                         # e.g. "mcp__notes__"; empty = no memory tools
+read_tools = ["search_notes", "get_note", "list_notes"]
+write_tools = ["create_note", "update_note"]
+
+[openrouter]
+referer = ""                            # optional HTTP-Referer sent to OpenRouter

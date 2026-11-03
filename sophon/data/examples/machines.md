@@ -1,0 +1,4 @@
+- laptop: <CPU>, <GPU or iGPU>, <RAM> GB RAM, battery. <OS>.
+- server: <CPU>, <GPU>, <RAM> GB RAM, <disk>, always on. Runs Ollama and llama.cpp.
+- phone: <model>.
+- Network: <how the machines reach each other, e.g. Tailscale>.

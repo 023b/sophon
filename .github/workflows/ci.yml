@@ -1,0 +1,27 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install -e '.[dev]'
+      - run: ruff check sophon tests bench swarm
+      - run: pytest -q
+      - name: package builds and the CLI starts
+        run: |
+          pip install build && python -m build --wheel
+          swarm --help >/dev/null
+          SOPHON_HOME="$RUNNER_TEMP/sophon" swarm init
+          SOPHON_HOME="$RUNNER_TEMP/sophon" swarm paths

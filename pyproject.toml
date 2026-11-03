@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sophon-swarm"
+version = "0.1.0"
+description = "A lead agent that runs a watchable team of Claude Code sessions, local Ollama models, SSD-streamed 120B MoE models and OpenRouter models from one terminal."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+keywords = ["agents", "multi-agent", "claude-code", "ollama", "llama.cpp", "mixture-of-experts", "tmux", "local-llm"]
+classifiers = [
+    "Environment :: Console",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = []
+
+[project.optional-dependencies]
+panel = ["textual>=0.80"]
+dev = ["pytest>=8", "ruff>=0.6", "textual>=0.80"]
+
+[project.scripts]
+swarm = "sophon.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/023b/sophon"
+Issues = "https://github.com/023b/sophon/issues"
+
+[tool.setuptools.packages.find]
+include = ["sophon*"]
+
+[tool.setuptools.package-data]
+sophon = ["data/**/*"]
+
+[tool.ruff]
+line-length = 130
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = ["E501", "E731", "E741"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
