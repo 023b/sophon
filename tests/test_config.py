@@ -34,7 +34,8 @@ def test_user_config_merges_over_defaults(tmp_path):
     assert c["models"]["strong"] == "qwen3:14b"
     assert c["models"]["worker"] == "gemma3:4b"          # untouched default
     assert c["big"]["ram_cap"] == "8G"
-    assert set(c["big"]["models"]) == {"big-gptoss", "big-x"}
+    assert set(c["big"]["models"]) == {"big-x"}           # replaces the packaged example, so phantom never
+                                                          # picks a model that was not downloaded
 
 
 def test_example_config_parses():

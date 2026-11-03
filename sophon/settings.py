@@ -105,10 +105,14 @@ def _merge(base, over):
 
 def load_config(path=None):
     p = Path(path or CONFIG_FILE)
-    if p.exists():
-        with p.open("rb") as f:
-            return _merge(DEFAULTS, tomllib.load(f))
-    return copy.deepcopy(DEFAULTS)
+    if not p.exists():
+        return copy.deepcopy(DEFAULTS)
+    with p.open("rb") as f:
+        user = tomllib.load(f)
+    cfg = _merge(DEFAULTS, user)
+    if (user.get("big") or {}).get("models"):  # your list of big models replaces the example, never extends it
+        cfg["big"]["models"] = copy.deepcopy(user["big"]["models"])
+    return cfg
 
 
 CFG = load_config()
