@@ -91,10 +91,18 @@ def check_cap(st, name, engine, model=None):
                  f"use the other engine, or change mode.")
 
 
+def sophon_env():
+    """SOPHON_HOME / SOPHON_CONFIG / XDG overrides for agent sessions: a tmux server started earlier would otherwise
+    hand them its own (older) environment, and the agents would read a different config and run folder."""
+    keys = ("SOPHON_HOME", "SOPHON_CONFIG", "XDG_CONFIG_HOME", "XDG_DATA_HOME", "XDG_STATE_HOME", "XDG_CACHE_HOME")
+    # never secrets: these go on the tmux command line, which other local users can read in `ps`
+    return {k: os.environ[k] for k in keys if os.environ.get(k)}
+
+
 def agent_command(run, st, name, persona, engine, model, kickoff):
     """Command line and extra env for one agent session."""
     sysp = build_system_prompt(run, name, persona, engine)
-    env = {"SWARM_ID": name, "SWARM_RUN": str(run), "PATH": f"{SWARM_BIN}:{os.environ.get('PATH', '')}"}
+    env = {"SWARM_ID": name, "SWARM_RUN": str(run), "PATH": f"{SWARM_BIN}:{os.environ.get('PATH', '')}", **sophon_env()}
     if engine in ("local", "local-lead"):
         ensure_tunnel()
         env["SWARM_MODEL"] = model
@@ -494,7 +502,7 @@ def go(mode_hint=None, job=None, sleep=False, agents=None, thorough=None, test=F
                   board_window=False)
     if job:
         (run / "context" / "JOB.md").write_text(job.strip() + "\n")
-    env = {"SWARM_ID": LEAD, "SWARM_RUN": str(run), "PATH": f"{SWARM_BIN}:{os.environ.get('PATH', '')}"}
+    env = {"SWARM_ID": LEAD, "SWARM_RUN": str(run), "PATH": f"{SWARM_BIN}:{os.environ.get('PATH', '')}", **sophon_env()}
     tmux("new-session", "-d", "-s", f"sw-{PANEL}", "-c", str(run), *[x for k, v in env.items() for x in ("-e", f"{k}={v}")],
          "zsh", "-c", f"{shlex.quote(SWARM)} panel")
     style_session(PANEL, "colour252", run)
