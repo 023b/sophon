@@ -347,14 +347,6 @@ the sentence that justifies each score, cap any score you cannot justify with a 
 Do NOT reward spectacle, virality or names here: this is a dissertation, judged on research value and feasibility.""")
 
 
-def lenient(rows, frac=0.40):
-    """True when the critic gave 4+ on every axis to more than frac of the ideas (the 20/20 behaviour)."""
-    if len(rows) < 4:
-        return False
-    high = sum(1 for r in rows if r["nums"] and min(r["nums"][:4]) >= 4)
-    return high / len(rows) > frac
-
-
 def table_rows(text):
     rows = []
     for row in text.splitlines():
