@@ -54,7 +54,10 @@ def build_system_prompt(run, name, persona, engine="claude"):
     role = pfile.read_text() if pfile.exists() else f"# Role: {name.upper()}\n{persona}\n"
     sysp = run / "agents" / f"{name}.sys.md"
     sysp.parent.mkdir(exist_ok=True)
-    note = ""
+    note = ("" if MEMORY_ALL else
+            "Long-term memory is NOT configured in this installation. Skip every memory step: no searches, no run "
+            "summary, reject memo requests with `swarm memo-done N rejected no memory configured`. Do not call any "
+            "MCP tool you were not given, even if one appears in your tool list.\n")
     sysp.write_text(f"{common}\n\nYour swarm id is `{name}`. Run folder: {run}\n{note}\n{role}")
     return sysp
 

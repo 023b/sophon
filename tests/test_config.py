@@ -83,3 +83,12 @@ def test_agent_sessions_get_sophon_locations_but_no_secrets(monkeypatch):
     env = sophon_env()
     assert env["SOPHON_HOME"] == os.environ["SOPHON_HOME"] and env["SOPHON_CONFIG"] == "/tmp/x.toml"
     assert "OPENROUTER_API_KEY" not in env
+
+
+def test_lead_is_told_when_memory_is_off(tmp_path):
+    from sophon.agents import build_system_prompt
+    from sophon.config import MEMORY_ALL
+    for d in ("agents",):
+        (tmp_path / d).mkdir()
+    text = build_system_prompt(tmp_path, "sophon", "sophon").read_text()
+    assert MEMORY_ALL == "" and "memory is NOT configured" in text
