@@ -74,3 +74,12 @@ def test_no_personal_data_in_package():
     for p in list((root / "sophon").rglob("*")) + list((root / "docs").rglob("*")) + [root / "README.md"]:
         if p.is_file() and p.suffix in (".py", ".md", ".toml", ".help", ".txt", ".sh"):
             assert not bad.search(p.read_text(errors="ignore")), p
+
+
+def test_agent_sessions_get_sophon_locations_but_no_secrets(monkeypatch):
+    from sophon.agents import sophon_env
+    monkeypatch.setenv("SOPHON_CONFIG", "/tmp/x.toml")
+    monkeypatch.setenv("OPENROUTER_API_KEY", "sk-test")
+    env = sophon_env()
+    assert env["SOPHON_HOME"] == os.environ["SOPHON_HOME"] and env["SOPHON_CONFIG"] == "/tmp/x.toml"
+    assert "OPENROUTER_API_KEY" not in env
