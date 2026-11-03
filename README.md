@@ -195,7 +195,7 @@ Details: [docs/safety.md](docs/safety.md).
 ## Status
 
 Working, but developed and tested on one setup; expect rough edges elsewhere. The window layout assumes X11 (or XWayland)
-and one or two screens. Contributions and bug reports are welcome.
+and one or two screens. Contributions and bug reports are welcome: see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Licence
 
