@@ -10,7 +10,7 @@ setup:
   swarm personas                         list the role prompts (yours override the packaged ones)
 
   swarm start BRIEF.md [--name NAME] [--manager PERSONA] [--context FILE]... [--add-dir DIR]...
-                                         new run: board window + manager on laptop screen
+                                         new run: board window + manager on the smaller screen
                                          (--manager manager-brainstorm = idea swarm template;
                                           --add-dir lets every agent edit a real project dir;
                                           --allow "Bash(pytest:*)" grants extra tools to all agents)
@@ -27,7 +27,7 @@ setup:
   swarm kill [NAME|all]                  close sessions and windows
 
 the lead (local-first lead with sole memory access):
-  swarm go                               new run: the lead intake on the laptop screen, board + panel on the big one
+  swarm go                               new run: lead intake on the smaller screen, board + panel on the larger
   swarm report MESSAGE...                worker -> lead (batched into a digest in overnight mode)
   swarm memo-request "TITLE" CONTENT...  ask the lead to store something in memory (lead approves)
   swarm memo-done ID approved|rejected [NOTE]   lead closes a memo request
