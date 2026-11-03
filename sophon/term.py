@@ -92,7 +92,7 @@ def tile(run, only=None):
     full_h = big["h"] - (y0 - big["y"])
     x0, width = big["x"], big["w"]
     names = [n for n in names if window_id(n, timeout=0.2)]
-    # Fixed layout so a new window never forces others to move: the panel owns the left 2/5 of the big screen,
+    # Fixed layout so a new window never forces others to move: the panel owns the left 2/5 of the larger screen,
     # worker windows fill a stable grid of slots on the right (first free slot wins), extras cascade.
     pw = big["w"] * 2 // 5
     if alive(PANEL) and only in (None, PANEL):

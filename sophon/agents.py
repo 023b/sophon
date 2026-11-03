@@ -511,7 +511,7 @@ def go(mode_hint=None, job=None, sleep=False, agents=None, thorough=None, test=F
         keep_awake(run)
     open_window(LEAD, "laptop")
     tile(run)
-    print(f"Sophon is open on the laptop screen. run: {run}" + ("" if tunnel else "  (warning: model host tunnel is down)"))
+    print(f"Sophon is open on the smaller screen. run: {run}" + ("" if tunnel else "  (warning: model host tunnel is down)"))
 
 
 def report_as(run, sender, msg):
