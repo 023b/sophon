@@ -106,7 +106,12 @@ In tests, Qwen3-Next wrote 2 to 4 times faster than gpt-oss but judged leniently
 Qwen3-Next and `role = "judge"` on gpt-oss. With one, it does both.
 
 A full phantom run took 2 h 33 min and scored 5.5 out of 10 against 8.5 for a Claude-led run on the same job. Use it
-when Claude usage or privacy matters more than time.
+when Claude usage or privacy matters more than time: one long job, left running overnight.
+
+A second recorded run, with both models on a 26 GB mini PC at a 16 GB cap, took 3 h 50 min and used 0 Claude tokens.
+It was not scored. Host samples every 2 s showed the model peaking at the 16.0 GB cap, at least 9.2 GB of RAM still
+available while a big model was loaded, and 17.8 TB read from the SSD across the whole machine, because pages
+dropped under the cap are read again. A Claude-led `light` run of the same job took 5 min 10 s.
 
 ## Requirements and limits
 

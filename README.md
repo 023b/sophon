@@ -26,6 +26,21 @@ needs you.
 - **Safety rails in code, not in prompts.** Bash file writes are blocked by a hook, spending has hard caps,
   OpenRouter only sees providers that do not train on prompts, and anything irreversible waits for you.
 
+## Why phantom mode exists
+
+You might have a low-end machine. That should not stop you from using an 80B or 120B model.
+
+Phantom mode is dead slow, and I will not pretend otherwise. But if you have one long job and can leave it running
+overnight, it does the job with no tokens to run out of and no bill at the end. If you need a way, there is a way.
+Here you go.
+
+What it costs you, measured on the same job as a Claude-led `light` run that took 5 min 10 s:
+
+- 3 h 50 min on a CPU-only mini PC with 26 GB of RAM, with the model capped at 16 GB (Qwen3-Next 80B writing,
+  gpt-oss 120B judging). gpt-oss 120B also runs at an 8 GB cap, at 2.5 tokens per second.
+- 43 GB and 63 GB of SSD space for the two model files, and 17.8 TB of SSD reads during that run.
+- A weaker answer. A Claude lead still catches more mistakes, so use one when you have the tokens.
+
 ## How it works
 
 ```mermaid

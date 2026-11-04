@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1 (2026-11-04)
+
+- Agents keep `SOPHON_HOME`, `SOPHON_CONFIG` and the XDG overrides when a tmux server is already running.
+- The lead is told when long-term memory is off, so it skips the summary and ends the run.
+- Docs: why phantom mode exists and what it costs, with a recorded 3 h 50 min run.
+
 ## 0.1.0 (2026-11-03)
 
 First public release.
