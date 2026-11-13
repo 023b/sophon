@@ -143,3 +143,19 @@ def test_practical_jobs_get_no_collisions():
     assert Q.requirements("Give me 8 ways to make my home server faster, with the exact command", fail, "x")["format"] == "practical"
     assert Q.requirements("10 dissertation topic ideas for my MSc", fail, "x")["format"] == "academic"
     assert Q.requirements("ideas for a viral 10-second Short", fail, "x")["format"] == "demo"
+
+
+def test_count_and_video_cues():
+    from sophon import quality as Q
+
+    def fail(*a, **k):
+        raise RuntimeError("no model")
+    assert Q.requirements("a short list of tools for note taking", fail, "x")["format"] != "demo"
+    assert Q.requirements("ideas for YouTube Shorts about robots", fail, "x")["format"] == "demo"
+    assert Q.requirements("ideas for a viral clip", fail, "x")["format"] == "demo"
+
+
+def test_parse_msg_tolerates_prefix_bytes():
+    from sophon.util import parse_msg
+    assert parse_msg("\x1b[0m[swarm msg from lens] done") == ("lens", "done")
+    assert parse_msg("plain text") == ("human", "plain text")

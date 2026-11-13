@@ -59,7 +59,11 @@ def requirements(job, schema_call, model):
     rc = regex_count(job)
     if rc and req.get("count") != rc:  # the regex reads the literal number; trust it over the model
         req["count"] = rc
-    if re.search(r"\bshorts?\b|viral|10-second|reel|tiktok|film", job, re.I):
+    if not rc and (req.get("count") or 0) <= 1:  # no number in the text: a model count of 1 is a misread, not a cap
+        req["count"] = 0
+    # "Shorts" only with a capital S or next to youtube: plain "short" (a short list) is not a video job
+    if re.search(r"\bShorts?\b|youtube shorts?|\bviral\b|10-second|\breels?\b|tiktok|\bfilm\b", job) or \
+            re.search(r"youtube shorts?|\bviral\b|tiktok", job, re.I):
         req["format"] = "demo"
     elif req.get("format") == "demo":  # the model may say demo for any 'impressive' job; demand a real cue
         req["format"] = "general"

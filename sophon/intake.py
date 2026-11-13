@@ -123,6 +123,10 @@ def intake_flow(run):
     except Exception as e:  # noqa: BLE001
         print(f"  local model unavailable ({e}); asking Claude instead")
     tri = clean_triage(tri)
+    if (not tri or not tri["understood"] or tri["confidence"] < 0.5) and load(run).get("mode_hint") in NO_CLAUDE_MODES:
+        print("  local model is unsure, but this run is local-only: continuing with local defaults")
+        tri = tri or dict(TRIAGE_DEFAULTS, understood=True, reason="local-only defaults")
+        tri["understood"], tri["confidence"] = True, max(tri["confidence"], 0.5)
     if not tri or not tri["understood"] or tri["confidence"] < 0.5:
         print("  local model is unsure what the job is; escalating to Claude for triage")
         who = "claude"
@@ -257,17 +261,23 @@ def intake_flow(run):
             OR.save_settings(mode=want)
             print(f"  OpenRouter: {OR.status_line()}")
     if o:
+        proposed = (mode, agents, thorough)
         mode = o[0] if o[0] in MODES else mode
         agents = int(o[1]) if len(o) > 1 and o[1].isdigit() else agents
         thorough = int(o[2]) if len(o) > 2 and o[2].isdigit() else thorough
-        who = "user-sim"
+        who = "the user"
+        if (mode, agents, thorough) != proposed:  # the model's reason argued for its own pick, not the user's
+            dec["reason"] = (f"the user chose {mode}, {agents} agents, thoroughness {thorough} (proposed: "
+                             f"{proposed[0]}, {proposed[1]}, {proposed[2]}; {dec.get('reason', '')})")
+            (run / "context" / "decision.json").write_text(json.dumps(
+                {"mode": mode, "agents": agents, "thorough": thorough, "by": who, "reason": dec["reason"]}, indent=1))
 
     # 4. write the brief and become the lead
     brief = (f"# Brief (the lead intake, {time.strftime('%Y-%m-%d %H:%M')})\n\n## Job (The user's words)\n{job}\n\n"
              f"## Clarifications\n{qa}\n\n## Run settings\n- mode: {mode} ({MODES[mode]['label']}), decided by {who}\n"
              f"- target agents: {agents}\n- thoroughness: {thorough} of 5\n- reason: {dec.get('reason', '')}\n"
              f"- OpenRouter: {OR.settings()['mode']} (off: never; free: free models only; paid: within caps)\n"
-             + ("\n## the user is asleep\nHe will read the result in the morning. Never wait for them and never stop to "
+             + ("\n## the user is asleep\nThey will read the result in the morning. Never wait for them and never stop to "
                 "ask them. If you need a decision they would make, run `swarm ask --type TYPE \"question\"` "
                 "with TYPE one of preference, scope, priority, format or clarify (answered on their behalf from their "
                 "profile; any other question is refused and goes to out/needs-you.md) or decide yourself and write the assumption into FINAL.md. Anything that needs their "
