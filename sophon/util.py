@@ -106,5 +106,6 @@ def latest(text, limit):
 
 
 def parse_msg(line):
-    m = re.match(r"\s*\[swarm msg from ([\w-]+)\]\s*(.*)", line)
+    # search, not match: stray terminal bytes before the marker made a real message look like junk
+    m = re.search(r"\[swarm msg from ([\w-]+)\]\s*(.*)", line)
     return (m[1], m[2]) if m else ("human", line.strip())

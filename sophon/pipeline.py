@@ -197,7 +197,9 @@ def local_lead():
             others = "; ".join(a.get("banned", [])[:8])
             ban = (f" Other workers own these angles, do not use them: {others}." if others else "")
             coll, allp = "", []
-            if req["format"] not in ("academic", "practical") and os.environ.get("SWARM_COLLIDE", "1") != "0":
+            # collision mashups only suit demo jobs; on study or practical jobs they produce noise
+            if (req["format"] == "demo" or os.environ.get("SWARM_COLLIDE") == "1") and \
+                    os.environ.get("SWARM_COLLIDE", "") != "0":
                 allp = Q.collisions(per * len(angles), int(samp[angles[0]["name"]]["seed"]))
             if allp:  # needs facts/assets.md (your own things) in the data folder; skipped without it
                 k0 = angles.index(a) * per

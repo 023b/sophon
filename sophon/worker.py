@@ -81,7 +81,7 @@ def local_worker():
         msgs = [{"role": "system", "content": system}]
         if ctx:
             msgs.append({"role": "user", "content": "Context for all tasks:\n\n" + ctx})
-            msgs.append({"role": "assistant", "content": "Understood."})
+            msgs.append({"role": "assistant", "content": "I have read the context. Send the task and I will do it in full."})
         msgs += ([] if task.startswith("PASS B") else history[-4:]) + [{"role": "user", "content": task}]
         print(f"{C['dim']}thinking on the model host ...{C['x']}", end="\r", flush=True)
         samp = run / "context" / "sampling.json"  # F1: per-worker temperature and seed set by the lead
@@ -90,6 +90,13 @@ def local_worker():
         opts = {k: v for k, v in (opts or {}).items() if k in ("temperature", "seed")}
         try:
             text, wait, rate = stream_chat(model, msgs, out=sys.stdout, num_predict=npred, options=opts)
+            if len(text.split()) < 25 and len(task.split()) > 12:  # an acknowledgement, not the work: ask once more
+                print(f"\n{C['amber']}reply too short ({len(text.split())} words), asking again{C['x']}")
+                text, wait, rate = stream_chat(model, msgs + [
+                    {"role": "assistant", "content": text},
+                    {"role": "user", "content": "That was only an acknowledgement. Do the task now, in full, in the "
+                                                "requested format. No preamble."}],
+                    out=sys.stdout, num_predict=npred, options=opts)
         except KeyboardInterrupt:
             print(f"\n{C['red']}stopped{C['x']}")
             set_status(run, me, "idle")
@@ -107,7 +114,8 @@ def local_worker():
         set_status(run, me, "idle")
         words = len(text.split())
         summary = re.sub(r"\s+", " ", re.sub(r"\|?\s*:?-{3,}:?\s*|\||[#*`>]", " ", text))[:240]
-        report_as(run, me, f"{me} done ({words} words) in out/{me}.md. Starts: {summary}")
+        label = f"{me} pass B (reversed-order check)" if task.startswith("PASS B") else me
+        report_as(run, me, f"{label} done ({words} words) in out/{me}.md. Starts: {summary}")
 
     kick = os.environ.get("SWARM_KICKOFF", "").strip()
     set_status(run, me, "idle")
